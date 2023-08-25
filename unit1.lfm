@@ -1,0 +1,158 @@
+object Form1: TForm1
+  Left = 287
+  Height = 727
+  Top = 150
+  Width = 1002
+  Caption = 'LitterRat'
+  ClientHeight = 706
+  ClientWidth = 1002
+  Menu = MainMenu1
+  OnCreate = FormCreate
+  LCLVersion = '2.2.0.4'
+  object screenplay: TMemo
+    Left = 56
+    Height = 608
+    Top = 48
+    Width = 776
+    Font.Quality = fqCleartypeNatural
+    Lines.Strings = (
+      'Memo1'
+    )
+    OnKeyPress = screenplayKeyPress
+    ParentFont = False
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+    WordWrap = False
+  end
+  object btnCharacter: TButton
+    Left = 843
+    Height = 25
+    Top = 67
+    Width = 147
+    Caption = 'Character'
+    OnClick = btnCharacterClick
+    TabOrder = 1
+  end
+  object btnDialogue: TButton
+    Left = 843
+    Height = 25
+    Top = 104
+    Width = 147
+    Caption = 'Dialogue'
+    OnClick = btnDialogueClick
+    TabOrder = 2
+  end
+  object btnScene: TButton
+    Left = 843
+    Height = 25
+    Top = 136
+    Width = 147
+    Caption = 'Scene'
+    OnClick = btnSceneClick
+    TabOrder = 3
+  end
+  object characterList: TListBox
+    Left = 843
+    Height = 360
+    Top = 296
+    Width = 147
+    ItemHeight = 0
+    OnClick = characterListClick
+    TabOrder = 4
+    TopIndex = -1
+  end
+  object lblCharacters: TLabel
+    Left = 888
+    Height = 17
+    Top = 280
+    Width = 62
+    Caption = 'Characters'
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 21
+    Top = 685
+    Width = 1002
+    Panels = <>
+  end
+  object btnTransition: TButton
+    Left = 843
+    Height = 25
+    Top = 184
+    Width = 147
+    Caption = 'Transition'
+    OnClick = btnTransitionClick
+    TabOrder = 6
+  end
+  object btnAction: TButton
+    Left = 843
+    Height = 25
+    Top = 224
+    Width = 147
+    Caption = 'Action'
+    OnClick = btnActionClick
+    TabOrder = 7
+  end
+  object MainMenu1: TMainMenu
+    Left = 30
+    Top = 7
+    object mnuFile: TMenuItem
+      Caption = 'File'
+      object mnuLoad: TMenuItem
+        Caption = 'Load file'
+        OnClick = mnuLoadClick
+      end
+      object mnuSave: TMenuItem
+        Caption = 'Save file'
+        OnClick = mnuSaveClick
+      end
+      object mnuDivider: TMenuItem
+        Caption = '-'
+      end
+      object mnuImportExport: TMenuItem
+        Caption = 'Import / Export'
+        object mnuExpFountain: TMenuItem
+          Caption = 'Export Fountain file'
+          OnClick = mnuExpFountainClick
+        end
+        object mnuImpFountain: TMenuItem
+          Caption = 'Import Fountain file'
+          OnClick = mnuImpFountainClick
+        end
+        object mnuDivider2: TMenuItem
+          Caption = '-'
+        end
+        object mnuExpHTML: TMenuItem
+          Caption = 'Export HTML'
+          OnClick = mnuExpHTMLClick
+        end
+      end
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'MenuItem2'
+    end
+  end
+  object ExportFountain: TSaveDialog
+    DefaultExt = '.fountain'
+    Left = 136
+    Top = 7
+  end
+  object ImportFountain: TOpenDialog
+    Left = 224
+    Top = 7
+  end
+  object saveScript: TSaveDialog
+    DefaultExt = '.lit'
+    Left = 328
+    Top = 8
+  end
+  object loadScript: TOpenDialog
+    Left = 400
+    Top = 8
+  end
+  object exportHTML: TSaveDialog
+    DefaultExt = '.html'
+    Left = 496
+    Top = 7
+  end
+end
