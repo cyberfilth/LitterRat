@@ -1,101 +1,131 @@
 object Form1: TForm1
-  Left = 287
-  Height = 727
-  Top = 150
-  Width = 1002
+  Left = 307
+  Height = 788
+  Top = 140
+  Width = 1296
   Caption = 'LitterRat'
-  ClientHeight = 706
-  ClientWidth = 1002
+  ClientHeight = 767
+  ClientWidth = 1296
   Menu = MainMenu1
   OnCreate = FormCreate
+  Position = poScreenCenter
   LCLVersion = '2.2.0.4'
-  object screenplay: TMemo
-    Left = 56
-    Height = 608
-    Top = 48
-    Width = 776
-    Font.Quality = fqCleartypeNatural
-    Lines.Strings = (
-      'Memo1'
-    )
-    OnKeyPress = screenplayKeyPress
-    ParentFont = False
-    ScrollBars = ssAutoVertical
-    TabOrder = 0
-    WordWrap = False
-  end
-  object btnCharacter: TButton
-    Left = 843
-    Height = 25
-    Top = 67
-    Width = 147
-    Caption = 'Character'
-    OnClick = btnCharacterClick
-    TabOrder = 1
-  end
-  object btnDialogue: TButton
-    Left = 843
-    Height = 25
-    Top = 104
-    Width = 147
-    Caption = 'Dialogue'
-    OnClick = btnDialogueClick
-    TabOrder = 2
-  end
-  object btnScene: TButton
-    Left = 843
-    Height = 25
-    Top = 136
-    Width = 147
-    Caption = 'Scene'
-    OnClick = btnSceneClick
-    TabOrder = 3
-  end
-  object characterList: TListBox
-    Left = 843
-    Height = 360
-    Top = 296
-    Width = 147
-    ItemHeight = 0
-    OnClick = characterListClick
-    TabOrder = 4
-    TopIndex = -1
-  end
-  object lblCharacters: TLabel
-    Left = 888
-    Height = 17
-    Top = 280
-    Width = 62
-    Caption = 'Characters'
-  end
   object StatusBar1: TStatusBar
     Left = 0
     Height = 21
-    Top = 685
-    Width = 1002
+    Top = 746
+    Width = 1296
     Panels = <>
   end
-  object btnTransition: TButton
-    Left = 843
-    Height = 25
-    Top = 184
-    Width = 147
-    Caption = 'Transition'
-    OnClick = btnTransitionClick
-    TabOrder = 6
+  object panelScript: TPanel
+    Left = 0
+    Height = 746
+    Top = 0
+    Width = 1048
+    Align = alClient
+    BevelOuter = bvNone
+    Caption = 'panelScript'
+    ClientHeight = 746
+    ClientWidth = 1048
+    TabOrder = 1
+    object screenplay: TMemo
+      Left = 10
+      Height = 736
+      Top = 10
+      Width = 1028
+      Align = alClient
+      BorderSpacing.Left = 10
+      BorderSpacing.Top = 10
+      BorderSpacing.Right = 10
+      Lines.Strings = (
+        'Memo1'
+      )
+      OnChange = screenplayChange
+      ScrollBars = ssAutoVertical
+      TabOrder = 0
+    end
   end
-  object btnAction: TButton
-    Left = 843
-    Height = 25
-    Top = 224
-    Width = 147
-    Caption = 'Action'
-    OnClick = btnActionClick
-    TabOrder = 7
+  object panelButtons: TPanel
+    Left = 1048
+    Height = 746
+    Top = 0
+    Width = 248
+    Align = alRight
+    BevelOuter = bvNone
+    ClientHeight = 746
+    ClientWidth = 248
+    TabOrder = 2
+    object btnCharacter: TButton
+      Left = 32
+      Height = 32
+      Top = 8
+      Width = 176
+      Caption = 'Character'
+      OnClick = btnCharacterClick
+      TabOrder = 0
+    end
+    object btnDialogue: TButton
+      Left = 32
+      Height = 32
+      Top = 48
+      Width = 176
+      Caption = 'Dialogue'
+      OnClick = btnDialogueClick
+      TabOrder = 1
+    end
+    object btnScene: TButton
+      Left = 32
+      Height = 32
+      Top = 88
+      Width = 176
+      Caption = 'Scene'
+      OnClick = btnSceneClick
+      TabOrder = 2
+    end
+    object btnTransition: TButton
+      Left = 32
+      Height = 32
+      Top = 128
+      Width = 176
+      Caption = 'Transition'
+      OnClick = btnTransitionClick
+      TabOrder = 3
+    end
+    object btnAction: TButton
+      Left = 32
+      Height = 32
+      Top = 168
+      Width = 176
+      Caption = 'Action'
+      OnClick = btnActionClick
+      TabOrder = 4
+    end
+    object lblCharacters: TLabel
+      Left = 88
+      Height = 17
+      Top = 256
+      Width = 62
+      Caption = 'Characters'
+      Font.Quality = fqCleartype
+      ParentFont = False
+    end
+    object characterList: TListBox
+      Left = 5
+      Height = 436
+      Top = 280
+      Width = 228
+      Align = alClient
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 280
+      BorderSpacing.Right = 15
+      BorderSpacing.Bottom = 30
+      ItemHeight = 0
+      TabOrder = 5
+      TopIndex = -1
+    end
   end
   object MainMenu1: TMainMenu
-    Left = 30
-    Top = 7
+    Left = 128
     object mnuFile: TMenuItem
       Caption = 'File'
       object mnuLoad: TMenuItem
@@ -106,20 +136,20 @@ object Form1: TForm1
         Caption = 'Save file'
         OnClick = mnuSaveClick
       end
-      object mnuDivider: TMenuItem
+      object divider1: TMenuItem
         Caption = '-'
       end
       object mnuImportExport: TMenuItem
         Caption = 'Import / Export'
-        object mnuExpFountain: TMenuItem
-          Caption = 'Export Fountain file'
-          OnClick = mnuExpFountainClick
-        end
         object mnuImpFountain: TMenuItem
           Caption = 'Import Fountain file'
           OnClick = mnuImpFountainClick
         end
-        object mnuDivider2: TMenuItem
+        object mnuExpFountain: TMenuItem
+          Caption = 'Export Fountain file'
+          OnClick = mnuExpFountainClick
+        end
+        object divider2: TMenuItem
           Caption = '-'
         end
         object mnuExpHTML: TMenuItem
@@ -127,32 +157,63 @@ object Form1: TForm1
           OnClick = mnuExpHTMLClick
         end
       end
+      object divider3: TMenuItem
+        Caption = '-'
+      end
+      object mnuExit: TMenuItem
+        Caption = 'Exit'
+        OnClick = mnuExitClick
+      end
     end
-    object MenuItem2: TMenuItem
-      Caption = 'MenuItem2'
+    object mnuDocument: TMenuItem
+      Caption = 'Document'
+      object mnuThemes: TMenuItem
+        Caption = 'Themes'
+        object mnuLight: TMenuItem
+          Caption = 'Light (Default)'
+          OnClick = mnuLightClick
+        end
+        object mnuDark: TMenuItem
+          Caption = 'Dark'
+          OnClick = mnuDarkClick
+        end
+        object mnuWhite: TMenuItem
+          Caption = 'White'
+          OnClick = mnuWhiteClick
+        end
+      end
+      object divider4: TMenuItem
+        Caption = '-'
+      end
+      object mnuHideSide: TMenuItem
+        Caption = 'Hide sidebar'
+        OnClick = mnuHideSideClick
+      end
     end
   end
   object ExportFountain: TSaveDialog
     DefaultExt = '.fountain'
-    Left = 136
-    Top = 7
+    Left = 220
+    Top = 2
   end
   object ImportFountain: TOpenDialog
-    Left = 224
-    Top = 7
+    Filter = 'Fountain file|*.fountain'
+    Left = 309
+    Top = 2
   end
   object saveScript: TSaveDialog
     DefaultExt = '.lit'
-    Left = 328
-    Top = 8
+    Left = 400
+    Top = 2
   end
   object loadScript: TOpenDialog
-    Left = 400
-    Top = 8
+    Filter = 'LitterRat file|*.lit'
+    Left = 496
+    Top = 2
   end
   object exportHTML: TSaveDialog
     DefaultExt = '.html'
-    Left = 496
-    Top = 7
+    Left = 592
+    Top = 2
   end
 end

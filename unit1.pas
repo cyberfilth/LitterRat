@@ -5,8 +5,8 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ComCtrls, Menus, jsonConf, fpjson, StrUtils;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
+  ExtCtrls, StdCtrls, jsonConf, fpjson, StrUtils, LCLType;
 
 type
   textType = (tNone, tCharacter, tScene, tDialogue, tTransition, tAction);
@@ -21,41 +21,58 @@ type
     btnScene: TButton;
     btnTransition: TButton;
     btnAction: TButton;
-    characterList: TListBox;
     lblCharacters: TLabel;
+    characterList: TListBox;
     MainMenu1: TMainMenu;
+    divider1: TMenuItem;
+    divider2: TMenuItem;
+    divider3: TMenuItem;
+    mnuExit: TMenuItem;
+    mnuHideSide: TMenuItem;
+    mnuWhite: TMenuItem;
+    mnuDark: TMenuItem;
+    mnuLight: TMenuItem;
+    mnuThemes: TMenuItem;
     mnuExpHTML: TMenuItem;
-    mnuDivider2: TMenuItem;
-    mnuDivider: TMenuItem;
-    mnuImportExport: TMenuItem;
     mnuExpFountain: TMenuItem;
     mnuImpFountain: TMenuItem;
+    mnuImportExport: TMenuItem;
     mnuSave: TMenuItem;
     mnuLoad: TMenuItem;
-    mnuFile: TMenuItem;
-    MenuItem2: TMenuItem;
     ImportFountain: TOpenDialog;
     loadScript: TOpenDialog;
-    exportHTML: TSaveDialog;
-    saveScript: TSaveDialog;
-    screenplay: TMemo;
-    StatusBar1: TStatusBar;
     ExportFountain: TSaveDialog;
+    saveScript: TSaveDialog;
+    exportHTML: TSaveDialog;
+    screenplay: TMemo;
+    mnuFile: TMenuItem;
+    mnuDocument: TMenuItem;
+    panelScript: TPanel;
+    panelButtons: TPanel;
+    divider4: TMenuItem;
+    StatusBar1: TStatusBar;
     procedure btnActionClick(Sender: TObject);
     procedure btnCharacterClick(Sender: TObject);
     procedure btnDialogueClick(Sender: TObject);
-    procedure btnHTMLClick(Sender: TObject);
     procedure btnSceneClick(Sender: TObject);
     procedure btnTransitionClick(Sender: TObject);
-    procedure characterListClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure mnuExpHTMLClick(Sender: TObject);
-    procedure mnuImpFountainClick(Sender: TObject);
+    procedure mnuDarkClick(Sender: TObject);
+    procedure mnuExitClick(Sender: TObject);
     procedure mnuExpFountainClick(Sender: TObject);
+    procedure mnuExpHTMLClick(Sender: TObject);
+    procedure mnuHideSideClick(Sender: TObject);
+    procedure mnuImpFountainClick(Sender: TObject);
+    procedure mnuLightClick(Sender: TObject);
     procedure mnuLoadClick(Sender: TObject);
     procedure mnuSaveClick(Sender: TObject);
-    procedure screenplayKeyPress(Sender: TObject; var Key: char);
+    procedure mnuWhiteClick(Sender: TObject);
+    procedure screenplayChange(Sender: TObject);
     procedure updateStatusBar;
+    (* Checks if character name is already on the list *)
+    function alreadyInList(characterName: string): boolean;
+    (* Stops program closing if document not saved *)
+    procedure closeWithoutSaving;
   private
 
   public
@@ -63,12 +80,13 @@ type
   end;
 
 const
-  VERSION = '0.4';
+  VERSION = '0.6';
 
 var
   Form1: TForm1;
   currentStatus: textType;
-  Filepath: string;
+  Filepath, documentName: string;
+  FileSaved: boolean;
 
 implementation
 
@@ -94,12 +112,15 @@ begin
     else
       // else, add a newline
       screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak;
-    characterList.Items.Add(UpperCase(characterName));
-    (* Display character list *)
-    if characterList.Visible = False then
+    if (alreadyInList(characterName) = False) then
     begin
-      lblCharacters.Visible := True;
-      characterList.Visible := True;
+      characterList.Items.Add(UpperCase(characterName));
+      (* Display character list *)
+      if characterList.Visible = False then
+      begin
+        lblCharacters.Visible := True;
+        characterList.Visible := True;
+      end;
     end;
     screenplay.SetFocus;
     currentStatus := tDialogue;
@@ -121,48 +142,6 @@ end;
 procedure TForm1.btnDialogueClick(Sender: TObject);
 begin
   currentStatus := tDialogue;
-end;
-
-procedure TForm1.btnHTMLClick(Sender: TObject);
-var
-  HTMLstring, transitionString: string;
-  i: integer;
-begin
-  HTMLstring := '';
-
-  (* Add HTML skeleton *)
-  HTMLstring := HTMLstring + '<!DOCTYPE html>' + sLineBreak + '<html>' +
-    sLineBreak + '<head>' + sLineBreak + '<title>LitterRat</title>' +
-    sLineBreak + '<style>' + sLineBreak + 'div {text-align: center;}' +
-    sLineBreak + '</style>' + sLineBreak + '</head>' + sLineBreak +
-    '<body>' + sLineBreak;
-  (* Add script *)
-  for i := 0 to screenplay.Lines.Count do
-  begin
-    (* Blank lines *)
-    if (screenplay.Lines[i] = '') or (screenplay.Lines[i] = ' ') then
-      HTMLstring := HTMLstring + '<br /><br />' + sLineBreak
-
-    (* Scene description *)
-    else if (LeftStr(screenplay.Lines[i], 3) = 'EXT') or
-      (LeftStr(screenplay.Lines[i], 3) = 'INT') or
-      (LeftStr(screenplay.Lines[i], 3) = 'EST') then
-      HTMLstring := HTMLstring + '<strong>' + screenplay.Lines[i] +
-        '</strong>' + sLineBreak
-
-    (* Transition *)
-    else if (LeftStr(screenplay.Lines[i], 1) = '>') then
-    begin
-      transitionString := screenplay.Lines[i];
-      HTMLstring := HTMLstring + RightStr(transitionString,
-        Length(transitionString) - 1) + sLineBreak + '<br />';
-    end
-
-    else
-      HTMLstring := HTMLstring + '<div>' + sLineBreak + screenplay.Lines[i] +
-        sLineBreak + '</div>';
-  end;
-  HTMLstring := HTMLstring + '</body>' + sLineBreak + '</html>' + sLineBreak;
 end;
 
 procedure TForm1.btnSceneClick(Sender: TObject);
@@ -207,26 +186,47 @@ begin
   screenplay.SetFocus;
 end;
 
-procedure TForm1.characterListClick(Sender: TObject);
-begin
-  screenplay.SelText := characterList.GetSelectedText + sLineBreak;
-  screenplay.SetFocus;
-  currentStatus := tDialogue;
-end;
-
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   Filepath := '';
+  FileSaved := True;
+  Form1.Caption := 'LitterRat';
+  documentName := '';
   (* Hide Character list *)
   if (characterList.items.Count = 0) then
   begin
     lblCharacters.Visible := False;
     characterList.Visible := False;
   end;
+  (* Set colour theme *)
+  mnuLightClick(nil);
   (* Clear text *)
   screenplay.Clear;
   currentStatus := tNone;
   updateStatusBar;
+end;
+
+procedure TForm1.mnuDarkClick(Sender: TObject);
+begin
+  screenplay.Color := clBlack;
+  screenplay.Font.Color := clCream;
+  mnuWhite.Checked := False;
+  mnuDark.Checked := True;
+  mnuLight.Checked := False;
+end;
+
+procedure TForm1.mnuExitClick(Sender: TObject);
+begin
+  if (FileSaved = False) then
+    closeWithoutSaving
+  else
+    Form1.Close;
+end;
+
+procedure TForm1.mnuExpFountainClick(Sender: TObject);
+begin
+  if ExportFountain.Execute then
+    screenplay.Lines.SaveToFile(ExportFountain.FileName);
 end;
 
 procedure TForm1.mnuExpHTMLClick(Sender: TObject);
@@ -248,7 +248,7 @@ begin
     sLineBreak + '.transition {text-align: right;}' + sLineBreak +
     '</style>' + sLineBreak + '</head>' + sLineBreak + '<body>' + sLineBreak;
   (* Add script *)
-  for i := 0 to screenplay.Lines.Count do
+  for i := 0 to screenplay.Lines.Count - 1 do
   begin
     (* Blank lines *)
     if (screenplay.Lines[i] = '') or (screenplay.Lines[i] = ' ') then
@@ -284,16 +284,33 @@ begin
   end;
 end;
 
+procedure TForm1.mnuHideSideClick(Sender: TObject);
+begin
+  if (panelButtons.Visible = True) then
+  begin
+    panelButtons.Visible := False;
+    mnuHideSide.Checked := True;
+  end
+  else
+  begin
+    panelButtons.Visible := True;
+    mnuHideSide.Checked := False;
+  end;
+end;
+
 procedure TForm1.mnuImpFountainClick(Sender: TObject);
 begin
   if ImportFountain.Execute then
     screenplay.Lines.LoadFromFile(ImportFountain.Filename);
 end;
 
-procedure TForm1.mnuExpFountainClick(Sender: TObject);
+procedure TForm1.mnuLightClick(Sender: TObject);
 begin
-  if ExportFountain.Execute then
-    screenplay.Lines.SaveToFile(ExportFountain.FileName);
+  screenplay.Color := clCream;
+  screenplay.Font.Color := clBlack;
+  mnuWhite.Checked := False;
+  mnuDark.Checked := False;
+  mnuLight.Checked := True;
 end;
 
 procedure TForm1.mnuLoadClick(Sender: TObject);
@@ -355,6 +372,9 @@ begin
         lblCharacters.Visible := True;
         characterList.Visible := True;
       end;
+      documentName := ExtractFileName(loadScript.FileName);
+      Form1.Caption := 'LitterRat: ' + documentName;
+      FileSaved := True;
     end;
   end;
 end;
@@ -380,86 +400,27 @@ begin
   finally
     c.Free;
   end;
+  documentName := ExtractFileName(saveScript.FileName);
+  Form1.Caption := 'LitterRat: ' + documentName;
+  FileSaved := True;
 end;
 
-procedure TForm1.screenplayKeyPress(Sender: TObject; var Key: char);
-var
-  Row, Col: integer;
-  characterName: string;
+procedure TForm1.mnuWhiteClick(Sender: TObject);
 begin
-  (* Triggered when the ENTER key is pressed *)
-  if (Key = #13) then
+  screenplay.Color := clWhite;
+  screenplay.Font.Color := clBlack;
+  mnuWhite.Checked := True;
+  mnuDark.Checked := False;
+  mnuLight.Checked := False;
+end;
+
+procedure TForm1.screenplayChange(Sender: TObject);
+begin
+  if (FileSaved = True) then
   begin
-    // select last line
-    Col := screenplay.CaretPos.x;
-    Row := screenplay.CaretPos.y;
-
-    (* Character *)
-    if currentStatus = tCharacter then
-    begin
-      screenplay.SelStart := screenplay.SelStart + screenplay.SelLength - Col;
-      screenplay.SelLength := Length(screenplay.Lines[Row]);
-      // capitalise last line
-      if (Length(screenplay.SelText) > 0) then
-      begin
-        (* Format the text and add to list of characters *)
-        characterName := screenplay.SelText;
-        screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak;
-        characterList.Items.Add(UpperCase(characterName));
-        (* Display character list *)
-        if characterList.Visible = False then
-        begin
-          lblCharacters.Visible := True;
-          characterList.Visible := True;
-        end;
-        screenplay.SetFocus;
-        currentStatus := tDialogue;
-      end;
-    end
-
-    (* Scene *)
-    else if currentStatus = tScene then
-    begin
-      screenplay.SelStart := screenplay.SelStart + screenplay.SelLength - Col;
-      screenplay.SelLength := Length(screenplay.Lines[Row]);
-      // capitalise last line
-      if (Length(screenplay.SelText) > 0) then
-      begin
-        (* Format the text *)
-        screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak + sLineBreak;
-        screenplay.SetFocus;
-        currentStatus := tCharacter;
-      end;
-    end
-
-    (* Transition *)
-    else if currentStatus = tTransition then
-    begin
-      screenplay.SelStart := screenplay.SelStart + screenplay.SelLength - Col;
-      screenplay.SelLength := Length(screenplay.Lines[Row]);
-      // capitalise last line
-      if (Length(screenplay.SelText) > 0) then
-      begin
-        (* Format the text *)
-        if (screenplay.SelText[1] <> '>') then
-          screenplay.SelText :=
-            '>' + UpperCase(screenplay.SelText) + sLineBreak + sLineBreak
-        else
-          screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak + sLineBreak;
-        screenplay.SetFocus;
-        currentStatus := tScene;
-      end;
-    end
-
-    (* Action *)
-    else if currentStatus = tAction then
-    begin
-      screenplay.SetFocus;
-      currentStatus := tCharacter;
-    end;
-
+    FileSaved := False;
+    Form1.Caption := Form1.Caption + ' *';
   end;
-  updateStatusBar;
 end;
 
 procedure TForm1.updateStatusBar;
@@ -474,6 +435,32 @@ begin
       tAction: StatusBar1.SimpleText := 'Mode: Action';
     end;
   end;
+end;
+
+function TForm1.alreadyInList(characterName: string): boolean;
+var
+  i: integer;
+begin
+  Result := False;
+  characterList.ClearSelection;
+  for i := 0 to characterList.Items.Count - 1 do
+    if (characterList.Items[i] = UpperCase(characterName)) then
+    begin
+      Result := True;
+      exit;
+    end;
+end;
+
+procedure TForm1.closeWithoutSaving;
+var
+  Reply, BoxStyle: integer;
+begin
+  BoxStyle := MB_ICONQUESTION + MB_YESNO;
+  Reply := Application.MessageBox('Do you want to Exit without saving document?',
+    'File not saved', BoxStyle);
+  if Reply = idYes then Form1.Close
+  else
+    Exit;
 end;
 
 end.
