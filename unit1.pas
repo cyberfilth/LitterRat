@@ -543,7 +543,12 @@ begin
       begin
         (* Format the text and add to list of characters *)
         characterName := screenplay.SelText;
+        {$IFDEF Linux}
+        screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak;
+        {$ENDIF}
+        {$IFDEF Windows}
         screenplay.SelText := UpperCase(screenplay.SelText);
+        {$ENDIF}
         if (alreadyInList(characterName) = False) then
         begin
           characterList.Items.Add(UpperCase(characterName));
@@ -568,7 +573,12 @@ begin
       if (Length(screenplay.SelText) > 0) then
       begin
         (* Format the text *)
+        {$IFDEF Linux}
+        screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak + sLineBreak;
+        {$ENDIF}
+        {$IFDEF Windows}
         screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak;
+         {$ENDIF}
         screenplay.SetFocus;
         currentStatus := tCharacter;
       end;
