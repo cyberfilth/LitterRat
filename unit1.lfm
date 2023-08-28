@@ -1,10 +1,10 @@
 object Form1: TForm1
-  Left = 307
-  Height = 788
-  Top = 140
+  Left = 68
+  Height = 718
+  Top = 25
   Width = 1296
   Caption = 'LitterRat'
-  ClientHeight = 767
+  ClientHeight = 699
   ClientWidth = 1296
   Menu = MainMenu1
   OnCreate = FormCreate
@@ -12,25 +12,25 @@ object Form1: TForm1
   LCLVersion = '2.2.0.4'
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 21
-    Top = 746
+    Height = 19
+    Top = 680
     Width = 1296
     Panels = <>
   end
   object panelScript: TPanel
     Left = 0
-    Height = 746
+    Height = 680
     Top = 0
     Width = 1048
     Align = alClient
     BevelOuter = bvNone
     Caption = 'panelScript'
-    ClientHeight = 746
+    ClientHeight = 680
     ClientWidth = 1048
     TabOrder = 1
     object screenplay: TMemo
       Left = 10
-      Height = 736
+      Height = 670
       Top = 10
       Width = 1028
       Align = alClient
@@ -47,12 +47,12 @@ object Form1: TForm1
   end
   object panelButtons: TPanel
     Left = 1048
-    Height = 746
+    Height = 680
     Top = 0
     Width = 248
     Align = alRight
     BevelOuter = bvNone
-    ClientHeight = 746
+    ClientHeight = 680
     ClientWidth = 248
     TabOrder = 2
     object btnCharacter: TButton
@@ -102,16 +102,16 @@ object Form1: TForm1
     end
     object lblCharacters: TLabel
       Left = 88
-      Height = 17
+      Height = 15
       Top = 256
-      Width = 62
+      Width = 65
       Caption = 'Characters'
       Font.Quality = fqCleartype
       ParentFont = False
     end
     object characterList: TListBox
       Left = 5
-      Height = 436
+      Height = 370
       Top = 280
       Width = 228
       Align = alClient
@@ -120,6 +120,7 @@ object Form1: TForm1
       BorderSpacing.Right = 15
       BorderSpacing.Bottom = 30
       ItemHeight = 0
+      OnClick = characterListClick
       TabOrder = 5
       TopIndex = -1
     end

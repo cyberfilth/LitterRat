@@ -56,6 +56,7 @@ type
     procedure btnDialogueClick(Sender: TObject);
     procedure btnSceneClick(Sender: TObject);
     procedure btnTransitionClick(Sender: TObject);
+    procedure characterListClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure mnuDarkClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
@@ -80,7 +81,7 @@ type
   end;
 
 const
-  VERSION = '0.6';
+  VERSION = '0.7';
 
 var
   Form1: TForm1;
@@ -184,6 +185,13 @@ begin
   end;
   updateStatusBar;
   screenplay.SetFocus;
+end;
+
+procedure TForm1.characterListClick(Sender: TObject);
+begin
+  screenplay.SelText := characterList.GetSelectedText + sLineBreak;
+  screenplay.SetFocus;
+  currentStatus := tDialogue;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
