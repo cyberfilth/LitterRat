@@ -5,6 +5,6 @@ Text editor for Fountain markdown
 
 Simple, lightweight text editor for Windows & Linux.
 
-[Download the Linux version here](https://github.com/cyberfilth/LitterRat/releases/download/v0.7/LitterRat_Linux.zip)
+[Download the Linux version here](https://github.com/cyberfilth/LitterRat/releases/download/v0.8/LitterRat_Linux.zip)
 
-[Download the Windows version here](https://github.com/cyberfilth/LitterRat/releases/download/v0.7/LitterRat_Windows.zip)
+[Download the Windows version here](https://github.com/cyberfilth/LitterRat/releases/download/v0.8/LitterRat_Windows.zip)
