@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
-  ExtCtrls, StdCtrls, jsonConf, fpjson, StrUtils, LCLType;
+  ExtCtrls, StdCtrls, jsonConf, fpjson, StrUtils, LCLType, unit2;
 
 type
   textType = (tNone, tCharacter, tScene, tDialogue, tTransition, tAction);
@@ -27,6 +27,9 @@ type
     divider1: TMenuItem;
     divider2: TMenuItem;
     divider3: TMenuItem;
+    mnuDocDeets: TMenuItem;
+    mnuNew: TMenuItem;
+    divider5: TMenuItem;
     mnuExit: TMenuItem;
     mnuHideSide: TMenuItem;
     mnuWhite: TMenuItem;
@@ -57,8 +60,10 @@ type
     procedure btnSceneClick(Sender: TObject);
     procedure btnTransitionClick(Sender: TObject);
     procedure characterListClick(Sender: TObject);
+    procedure characterListMouseEnter(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure mnuDarkClick(Sender: TObject);
+    procedure mnuDocDeetsClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure mnuExpFountainClick(Sender: TObject);
     procedure mnuExpHTMLClick(Sender: TObject);
@@ -66,9 +71,11 @@ type
     procedure mnuImpFountainClick(Sender: TObject);
     procedure mnuLightClick(Sender: TObject);
     procedure mnuLoadClick(Sender: TObject);
+    procedure mnuNewClick(Sender: TObject);
     procedure mnuSaveClick(Sender: TObject);
     procedure mnuWhiteClick(Sender: TObject);
     procedure screenplayChange(Sender: TObject);
+    procedure screenplayKeyPress(Sender: TObject; var Key: char);
     procedure updateStatusBar;
     (* Checks if character name is already on the list *)
     function alreadyInList(characterName: string): boolean;
@@ -81,12 +88,12 @@ type
   end;
 
 const
-  VERSION = '0.7';
+  VERSION = '0.8';
 
 var
   Form1: TForm1;
   currentStatus: textType;
-  Filepath, documentName: string;
+  Filepath, documentName, documentAuthor: string;
   FileSaved: boolean;
 
 implementation
@@ -194,12 +201,18 @@ begin
   currentStatus := tDialogue;
 end;
 
+procedure TForm1.characterListMouseEnter(Sender: TObject);
+begin
+  characterList.Hint := 'Click on a character name to add them to the screenplay';
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   Filepath := '';
   FileSaved := True;
   Form1.Caption := 'LitterRat';
   documentName := '';
+  documentAuthor := '';
   (* Hide Character list *)
   if (characterList.items.Count = 0) then
   begin
@@ -223,6 +236,11 @@ begin
   mnuLight.Checked := False;
 end;
 
+procedure TForm1.mnuDocDeetsClick(Sender: TObject);
+begin
+  frmDocDeets.Show;
+end;
+
 procedure TForm1.mnuExitClick(Sender: TObject);
 begin
   if (FileSaved = False) then
@@ -232,9 +250,32 @@ begin
 end;
 
 procedure TForm1.mnuExpFountainClick(Sender: TObject);
+var
+  fountainFile: TStringList;
+  i: integer;
 begin
   if ExportFountain.Execute then
-    screenplay.Lines.SaveToFile(ExportFountain.FileName);
+  begin
+    fountainFile := TStringList.Create;
+    try
+      fountainFile.Add('Title:');
+      fountainFile.Add('    _**' + documentName + '**_');
+      fountainFile.Add('Author: ' + documentAuthor);
+      fountainFile.Add(' ');
+      fountainFile.Add(' ');
+      fountainFile.Add(' ');
+      fountainFile.Add(' ');
+      fountainFile.Add(' ');
+      // Add the lines from TMemo individually
+      for i := 0 to screenplay.Lines.Count - 1 do
+      begin
+        fountainFile.Add(screenplay.Lines[i]);
+      end;
+      fountainFile.SaveToFile(ExportFountain.FileName);
+    finally
+      fountainFile.Free;
+    end;
+  end;
 end;
 
 procedure TForm1.mnuExpHTMLClick(Sender: TObject);
@@ -255,6 +296,10 @@ begin
     sLineBreak + '<style>' + sLineBreak + 'div {text-align: center;}' +
     sLineBreak + '.transition {text-align: right;}' + sLineBreak +
     '</style>' + sLineBreak + '</head>' + sLineBreak + '<body>' + sLineBreak;
+  (* Add document information *)
+  HTMLstring := HTMLstring + '<div><strong>' + documentName +
+    '</strong><br />Author: ' + documentAuthor + '</div>';
+
   (* Add script *)
   for i := 0 to screenplay.Lines.Count - 1 do
   begin
@@ -346,6 +391,8 @@ begin
         try
           if JSONData <> nil then
           begin
+            documentName := JSONData.FindPath('Title').AsString;
+            documentAuthor := JSONData.FindPath('Author').AsString;
             CharactersArray := JSONData.FindPath('Characters') as TJSONArray;
             if Assigned(CharactersArray) then
             begin
@@ -387,6 +434,48 @@ begin
   end;
 end;
 
+procedure TForm1.mnuNewClick(Sender: TObject);
+var
+  Reply, BoxStyle: integer;
+begin
+  if (FileSaved = False) then
+  begin
+    BoxStyle := MB_ICONQUESTION + MB_YESNO;
+    Reply := Application.MessageBox(
+      'Do you want to start a new document without saving?',
+      'File not saved', BoxStyle);
+    if Reply = idYes then
+      (* Delete current content *)
+    begin
+      screenplay.Lines.Clear;
+      characterList.Clear;
+      characterList.Visible := False;
+      lblCharacters.Visible := False;
+      Filepath := '';
+      FileSaved := True;
+      Form1.Caption := 'LitterRat';
+      documentName := '';
+      documentAuthor := '';
+      currentStatus := tNone;
+    end
+    else
+      Exit;
+  end
+  else
+  begin
+    screenplay.Lines.Clear;
+    characterList.Clear;
+    characterList.Visible := False;
+    lblCharacters.Visible := False;
+    Filepath := '';
+    FileSaved := True;
+    Form1.Caption := 'LitterRat';
+    documentName := '';
+    documentAuthor := '';
+    currentStatus := tNone;
+  end;
+end;
+
 procedure TForm1.mnuSaveClick(Sender: TObject);
 var
   c: TJSONConfig;
@@ -402,15 +491,16 @@ begin
       exit;
     end;
     c.SetValue('LitterRat Version', VERSION);
+    c.SetValue('Title', documentName);
+    c.SetValue('Author', documentAuthor);
     if (characterList.items.Count > 0) then
       c.SetValue('Characters', characterList.items);
     c.SetValue('Script', screenplay.Lines);
   finally
     c.Free;
   end;
-  documentName := ExtractFileName(saveScript.FileName);
-  Form1.Caption := 'LitterRat: ' + documentName;
   FileSaved := True;
+  Form1.Caption := 'LitterRat - ' + documentName;
 end;
 
 procedure TForm1.mnuWhiteClick(Sender: TObject);
@@ -429,6 +519,89 @@ begin
     FileSaved := False;
     Form1.Caption := Form1.Caption + ' *';
   end;
+end;
+
+procedure TForm1.screenplayKeyPress(Sender: TObject; var Key: char);
+var
+  Row, Col: integer;
+  characterName: string;
+begin
+  (* Triggered when the ENTER key is pressed *)
+  if (Key = #13) then
+  begin
+    // select last line
+    Col := screenplay.CaretPos.x;
+    Row := screenplay.CaretPos.y;
+
+    (* Character *)
+    if currentStatus = tCharacter then
+    begin
+      screenplay.SelStart := screenplay.SelStart + screenplay.SelLength - Col;
+      screenplay.SelLength := Length(screenplay.Lines[Row]);
+      // capitalise last line
+      if (Length(screenplay.SelText) > 0) then
+      begin
+        (* Format the text and add to list of characters *)
+        characterName := screenplay.SelText;
+        screenplay.SelText := UpperCase(screenplay.SelText);
+        if (alreadyInList(characterName) = False) then
+        begin
+          characterList.Items.Add(UpperCase(characterName));
+          (* Display character list *)
+          if characterList.Visible = False then
+          begin
+            lblCharacters.Visible := True;
+            characterList.Visible := True;
+          end;
+        end;
+        screenplay.SetFocus;
+        currentStatus := tDialogue;
+      end;
+    end
+
+    (* Scene *)
+    else if currentStatus = tScene then
+    begin
+      screenplay.SelStart := screenplay.SelStart + screenplay.SelLength - Col;
+      screenplay.SelLength := Length(screenplay.Lines[Row]);
+      // capitalise last line
+      if (Length(screenplay.SelText) > 0) then
+      begin
+        (* Format the text *)
+        screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak;
+        screenplay.SetFocus;
+        currentStatus := tCharacter;
+      end;
+    end
+
+    (* Transition *)
+    else if currentStatus = tTransition then
+    begin
+      screenplay.SelStart := screenplay.SelStart + screenplay.SelLength - Col;
+      screenplay.SelLength := Length(screenplay.Lines[Row]);
+      // capitalise last line
+      if (Length(screenplay.SelText) > 0) then
+      begin
+        (* Format the text *)
+        if (screenplay.SelText[1] <> '>') then
+          screenplay.SelText :=
+            '>' + UpperCase(screenplay.SelText) + sLineBreak + sLineBreak
+        else
+          screenplay.SelText := UpperCase(screenplay.SelText) + sLineBreak + sLineBreak;
+        screenplay.SetFocus;
+        currentStatus := tScene;
+      end;
+    end
+
+    (* Action *)
+    else if currentStatus = tAction then
+    begin
+      screenplay.SetFocus;
+      currentStatus := tCharacter;
+    end;
+
+  end;
+  updateStatusBar;
 end;
 
 procedure TForm1.updateStatusBar;

@@ -1,0 +1,65 @@
+object frmDocDeets: TfrmDocDeets
+  Left = 499
+  Height = 240
+  Top = 157
+  Width = 320
+  Caption = 'Screenplay Details'
+  ClientHeight = 240
+  ClientWidth = 320
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '2.2.6.0'
+  object edTitle: TEdit
+    Left = 8
+    Height = 23
+    Top = 32
+    Width = 304
+    TabOrder = 0
+    Text = 'edTitle'
+    TextHint = 'Title of screenplay'
+  end
+  object lblTitle: TLabel
+    Left = 144
+    Height = 15
+    Top = 16
+    Width = 22
+    Caption = 'Title'
+    Font.Quality = fqCleartype
+    ParentColor = False
+    ParentFont = False
+  end
+  object lblAuthor: TLabel
+    Left = 136
+    Height = 15
+    Top = 80
+    Width = 37
+    Caption = 'Author'
+    ParentColor = False
+  end
+  object edAuthor: TEdit
+    Left = 8
+    Height = 23
+    Top = 96
+    Width = 304
+    TabOrder = 1
+    Text = 'edAuthor'
+  end
+  object btnSave: TButton
+    Left = 24
+    Height = 25
+    Top = 168
+    Width = 75
+    Caption = 'Save'
+    OnClick = btnSaveClick
+    TabOrder = 2
+  end
+  object btnQuit: TButton
+    Left = 209
+    Height = 25
+    Top = 168
+    Width = 75
+    Caption = 'Quit'
+    OnClick = btnQuitClick
+    TabOrder = 3
+  end
+end
