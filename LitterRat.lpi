@@ -17,7 +17,7 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <MinorVersionNr Value="8"/>
+      <MinorVersionNr Value="9"/>
       <Language Value="0809"/>
     </VersionInfo>
     <BuildModes>
@@ -94,7 +94,7 @@
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
-      <DestinationDirectory Value="/home/chris/dev/exported"/>
+      <DestinationDirectory Value="/home/chris/Downloads/exportMe"/>
       <CompressFinally Value="False"/>
       <UseFileFilters Value="True"/>
     </PublishOptions>

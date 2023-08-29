@@ -88,7 +88,7 @@ type
   end;
 
 const
-  VERSION = '0.8';
+  VERSION = '0.9';
 
 var
   Form1: TForm1;
@@ -385,6 +385,15 @@ begin
     FileContent := TStringList.Create;
     try
       try
+        (* Clear current document *)
+        screenplay.Lines.Clear;
+        characterList.Clear;
+        characterList.Visible := False;
+        lblCharacters.Visible := False;
+        documentName := '';
+        documentAuthor := '';
+        currentStatus := tNone;
+
         (* Load the entire file content into FileContent *)
         FileContent.LoadFromFile(importFileName);
         (* Join the lines of FileContent to form JSONText *)
