@@ -143,11 +143,11 @@ object Form1: TForm1
       object divider5: TMenuItem
         Caption = '-'
       end
-      object mnuLoad: TMenuItem
-        Caption = 'Load file'
-        Hint = 'Load a LitterRat file'
-        ShortCut = 16460
-        OnClick = mnuLoadClick
+      object mnuOpen: TMenuItem
+        Caption = 'Open file'
+        Hint = 'Open a LitterRat file'
+        ShortCut = 16463
+        OnClick = mnuOpenClick
       end
       object mnuSave: TMenuItem
         Caption = 'Save file'

@@ -41,7 +41,7 @@ type
     mnuImpFountain: TMenuItem;
     mnuImportExport: TMenuItem;
     mnuSave: TMenuItem;
-    mnuLoad: TMenuItem;
+    mnuOpen: TMenuItem;
     ImportFountain: TOpenDialog;
     loadScript: TOpenDialog;
     ExportFountain: TSaveDialog;
@@ -70,7 +70,7 @@ type
     procedure mnuHideSideClick(Sender: TObject);
     procedure mnuImpFountainClick(Sender: TObject);
     procedure mnuLightClick(Sender: TObject);
-    procedure mnuLoadClick(Sender: TObject);
+    procedure mnuOpenClick(Sender: TObject);
     procedure mnuNewClick(Sender: TObject);
     procedure mnuSaveClick(Sender: TObject);
     procedure mnuWhiteClick(Sender: TObject);
@@ -238,7 +238,9 @@ end;
 
 procedure TForm1.mnuDocDeetsClick(Sender: TObject);
 begin
-  frmDocDeets.Show;
+  frmDocDeets.edTitle.Text := documentName;
+  frmDocDeets.edAuthor.Text := documentAuthor;
+  frmDocDeets.ShowModal;
 end;
 
 procedure TForm1.mnuExitClick(Sender: TObject);
@@ -258,14 +260,15 @@ begin
   begin
     fountainFile := TStringList.Create;
     try
-      fountainFile.Add('Title:');
-      fountainFile.Add('    _**' + documentName + '**_');
+      fountainFile.Add('Title: _**' + documentName + '**_');
       fountainFile.Add('Author: ' + documentAuthor);
       fountainFile.Add(' ');
       fountainFile.Add(' ');
       fountainFile.Add(' ');
       fountainFile.Add(' ');
       fountainFile.Add(' ');
+      fountainFile.Add(' ');
+
       // Add the lines from TMemo individually
       for i := 0 to screenplay.Lines.Count - 1 do
       begin
@@ -366,7 +369,7 @@ begin
   mnuLight.Checked := True;
 end;
 
-procedure TForm1.mnuLoadClick(Sender: TObject);
+procedure TForm1.mnuOpenClick(Sender: TObject);
 var
   JSONText, importFileName: string;
   JSONData: TJSONData;
@@ -427,7 +430,6 @@ begin
         lblCharacters.Visible := True;
         characterList.Visible := True;
       end;
-      documentName := ExtractFileName(loadScript.FileName);
       Form1.Caption := 'LitterRat: ' + documentName;
       FileSaved := True;
     end;

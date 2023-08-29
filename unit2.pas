@@ -57,15 +57,8 @@ end;
 
 procedure TfrmDocDeets.FormCreate(Sender: TObject);
 begin
-  if (Unit1.documentName <> '') then
-    edTitle.Text := Unit1.documentName
-  else
-    edTitle.Text := '';
-
-  if (Unit1.documentAuthor <> '') then
-    edAuthor.Text := Unit1.documentAuthor
-  else
-    edAuthor.Text := '';
+  edTitle.Text := Unit1.documentName;
+  edAuthor.Text := Unit1.documentAuthor;
 end;
 
 procedure TfrmDocDeets.btnQuitClick(Sender: TObject);
