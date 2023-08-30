@@ -161,11 +161,15 @@ end;
 procedure TForm1.btnActionClick(Sender: TObject);
 begin
   currentStatus := tAction;
+  updateStatusBar;
+  screenplay.SetFocus;
 end;
 
 procedure TForm1.btnDialogueClick(Sender: TObject);
 begin
   currentStatus := tDialogue;
+  updateStatusBar;
+  screenplay.SetFocus;
 end;
 
 procedure TForm1.btnSceneClick(Sender: TObject);
