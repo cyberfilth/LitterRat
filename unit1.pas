@@ -21,12 +21,23 @@ type
     btnScene: TButton;
     btnTransition: TButton;
     btnAction: TButton;
+    FindDialog1: TFindDialog;
     lblCharacters: TLabel;
     characterList: TListBox;
     MainMenu1: TMainMenu;
     divider1: TMenuItem;
     divider2: TMenuItem;
     divider3: TMenuItem;
+    divider6: TMenuItem;
+    rcFind: TMenuItem;
+    rcDivider1: TMenuItem;
+    mnuFind: TMenuItem;
+    rcAction: TMenuItem;
+    rcTransition: TMenuItem;
+    rcScene: TMenuItem;
+    rcDialogue: TMenuItem;
+    rcCharacter: TMenuItem;
+    mnuSaveAs: TMenuItem;
     mnuDocDeets: TMenuItem;
     mnuNew: TMenuItem;
     divider5: TMenuItem;
@@ -45,6 +56,7 @@ type
     ImportFountain: TOpenDialog;
     loadScript: TOpenDialog;
     ExportFountain: TSaveDialog;
+    rightClickMenu: TPopupMenu;
     saveScript: TSaveDialog;
     exportHTML: TSaveDialog;
     screenplay: TMemo;
@@ -61,17 +73,20 @@ type
     procedure btnTransitionClick(Sender: TObject);
     procedure characterListClick(Sender: TObject);
     procedure characterListMouseEnter(Sender: TObject);
+    procedure FindDialog1Find(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure mnuDarkClick(Sender: TObject);
     procedure mnuDocDeetsClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure mnuExpFountainClick(Sender: TObject);
     procedure mnuExpHTMLClick(Sender: TObject);
+    procedure mnuFindClick(Sender: TObject);
     procedure mnuHideSideClick(Sender: TObject);
     procedure mnuImpFountainClick(Sender: TObject);
     procedure mnuLightClick(Sender: TObject);
     procedure mnuOpenClick(Sender: TObject);
     procedure mnuNewClick(Sender: TObject);
+    procedure mnuSaveAsClick(Sender: TObject);
     procedure mnuSaveClick(Sender: TObject);
     procedure mnuWhiteClick(Sender: TObject);
     procedure screenplayChange(Sender: TObject);
@@ -82,18 +97,19 @@ type
     (* Stops program closing if document not saved *)
     procedure closeWithoutSaving;
   private
+    FFoundPos: integer;
 
   public
 
   end;
 
 const
-  VERSION = '0.9';
+  VERSION = '0.9.5';
 
 var
   Form1: TForm1;
   currentStatus: textType;
-  Filepath, documentName, documentAuthor: string;
+  Filepath, documentName, documentAuthor, savedFileLocation: string;
   FileSaved: boolean;
 
 implementation
@@ -206,13 +222,30 @@ begin
   characterList.Hint := 'Click on a character name to add them to the screenplay';
 end;
 
+procedure TForm1.FindDialog1Find(Sender: TObject);
+begin
+  with Sender as TFindDialog do
+  begin
+    FFoundPos := PosEx(FindText, screenplay.Lines.Text, FFoundPos + 1);
+    if FFoundPos > 0 then
+    begin
+      screenplay.SelStart := FFoundPos - 1;
+      screenplay.SelLength := Length(FindText);
+      screenplay.SetFocus; // Memo must be activate, or selection will not be displayed
+    end;
+  end;
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   Filepath := '';
   FileSaved := True;
   Form1.Caption := 'LitterRat';
   documentName := '';
+  StatusBar1.Panels.Items[2].Text := '';
   documentAuthor := '';
+  savedFileLocation := '';
+  mnuSave.Enabled := False;
   (* Hide Character list *)
   if (characterList.items.Count = 0) then
   begin
@@ -224,6 +257,7 @@ begin
   (* Clear text *)
   screenplay.Clear;
   currentStatus := tNone;
+  StatusBar1.Panels.Items[1].Text := 'LitterRat v' + VERSION;
   updateStatusBar;
 end;
 
@@ -295,13 +329,18 @@ begin
 
   (* Add HTML skeleton *)
   HTMLstring := HTMLstring + '<!DOCTYPE html>' + sLineBreak + '<html>' +
-    sLineBreak + '<head>' + sLineBreak + '<title>LitterRat</title>' +
-    sLineBreak + '<style>' + sLineBreak + 'div {text-align: center;}' +
+    sLineBreak + '<head>' + sLineBreak + '<title>' + documentName +
+    '</title>' + sLineBreak + '<style>' + sLineBreak + 'div {text-align: center;}' +
     sLineBreak + '.transition {text-align: right;}' + sLineBreak +
-    '</style>' + sLineBreak + '</head>' + sLineBreak + '<body>' + sLineBreak;
-  (* Add document information *)
+    'body {font-family: "Courier New", Courier; font-size: 12px}' +
+    sLineBreak + '</style>' + sLineBreak + '</head>' + sLineBreak +
+    '<body>' + sLineBreak;
+  (* Add title page *)
+  HTMLstring := HTMLstring + '<br /><br /><br /><br /><br /><br /><br />' + sLineBreak;
   HTMLstring := HTMLstring + '<div><strong>' + documentName +
     '</strong><br />Author: ' + documentAuthor + '</div>';
+  HTMLstring := HTMLstring +
+    '<br /><br /><br /><br /><br /><p style="page-break-before: always">' + sLineBreak;
 
   (* Add script *)
   for i := 0 to screenplay.Lines.Count - 1 do
@@ -337,6 +376,18 @@ begin
     Write(F, HTMLstring);
   finally
     CloseFile(F);
+  end;
+end;
+
+procedure TForm1.mnuFindClick(Sender: TObject);
+begin
+  with FindDialog1 do
+  begin
+    if frEntireScope in Options then
+      FFoundPos := 0
+    else
+      FFoundPos := screenplay.SelStart;
+    Execute;
   end;
 end;
 
@@ -382,6 +433,7 @@ begin
     if FileExists(loadScript.Filename) then
       importFileName := loadScript.Filename;
 
+    savedFileLocation := loadScript.Filename;
     FileContent := TStringList.Create;
     try
       try
@@ -391,6 +443,7 @@ begin
         characterList.Visible := False;
         lblCharacters.Visible := False;
         documentName := '';
+        StatusBar1.Panels.Items[2].Text := '';
         documentAuthor := '';
         currentStatus := tNone;
 
@@ -404,6 +457,7 @@ begin
           if JSONData <> nil then
           begin
             documentName := JSONData.FindPath('Title').AsString;
+            StatusBar1.Panels.Items[2].Text := JSONData.FindPath('Title').AsString;
             documentAuthor := JSONData.FindPath('Author').AsString;
             CharactersArray := JSONData.FindPath('Characters') as TJSONArray;
             if Assigned(CharactersArray) then
@@ -441,6 +495,7 @@ begin
       end;
       Form1.Caption := 'LitterRat: ' + documentName;
       FileSaved := True;
+      mnuSave.Enabled := True;
     end;
   end;
 end;
@@ -464,9 +519,12 @@ begin
       lblCharacters.Visible := False;
       Filepath := '';
       FileSaved := True;
+      mnuSave.Enabled := False;
       Form1.Caption := 'LitterRat';
       documentName := '';
+      StatusBar1.Panels.Items[2].Text := '';
       documentAuthor := '';
+      savedFileLocation := '';
       currentStatus := tNone;
     end
     else
@@ -480,14 +538,16 @@ begin
     lblCharacters.Visible := False;
     Filepath := '';
     FileSaved := True;
+    mnuSave.Enabled := False;
     Form1.Caption := 'LitterRat';
     documentName := '';
+    StatusBar1.Panels.Items[2].Text := '';
     documentAuthor := '';
     currentStatus := tNone;
   end;
 end;
 
-procedure TForm1.mnuSaveClick(Sender: TObject);
+procedure TForm1.mnuSaveAsClick(Sender: TObject);
 var
   c: TJSONConfig;
 begin
@@ -498,6 +558,33 @@ begin
       if saveScript.Execute then
         c.Filename := ExtractFilePath(saveScript.FileName) +
           ExtractFileName(saveScript.FileName);
+    except
+      exit;
+    end;
+    savedFileLocation := c.Filename;
+    c.SetValue('LitterRat Version', VERSION);
+    c.SetValue('Title', documentName);
+    c.SetValue('Author', documentAuthor);
+    if (characterList.items.Count > 0) then
+      c.SetValue('Characters', characterList.items);
+    c.SetValue('Script', screenplay.Lines);
+  finally
+    c.Free;
+  end;
+  FileSaved := True;
+  Form1.Caption := 'LitterRat - ' + documentName;
+  mnuSaveAs.Enabled := True;
+end;
+
+procedure TForm1.mnuSaveClick(Sender: TObject);
+var
+  c: TJSONConfig;
+begin
+  c := TJSONConfig.Create(nil);
+  try
+    try
+      c.Formatted := True;
+      c.Filename := savedFileLocation;
     except
       exit;
     end;
@@ -512,6 +599,7 @@ begin
   end;
   FileSaved := True;
   Form1.Caption := 'LitterRat - ' + documentName;
+  mnuSaveAs.Enabled := True;
 end;
 
 procedure TForm1.mnuWhiteClick(Sender: TObject);
@@ -630,11 +718,11 @@ begin
   if (currentStatus <> tNone) then
   begin
     case currentStatus of
-      tCharacter: StatusBar1.SimpleText := 'Mode: Character name';
-      tDialogue: StatusBar1.SimpleText := 'Mode: Dialogue';
-      tScene: StatusBar1.SimpleText := 'Mode: Scene description';
-      tTransition: StatusBar1.SimpleText := 'Mode: Transition';
-      tAction: StatusBar1.SimpleText := 'Mode: Action';
+      tCharacter: StatusBar1.Panels.Items[0].Text := 'Mode: Character name';
+      tDialogue: StatusBar1.Panels.Items[0].Text := 'Mode: Dialogue';
+      tScene: StatusBar1.Panels.Items[0].Text := 'Mode: Scene description';
+      tTransition: StatusBar1.Panels.Items[0].Text := 'Mode: Transition';
+      tAction: StatusBar1.Panels.Items[0].Text := 'Mode: Action';
     end;
   end;
 end;
