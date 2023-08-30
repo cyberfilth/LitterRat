@@ -275,6 +275,7 @@ begin
   frmDocDeets.edTitle.Text := documentName;
   frmDocDeets.edAuthor.Text := documentAuthor;
   frmDocDeets.ShowModal;
+  StatusBar1.Panels.Items[2].Text := documentName;
 end;
 
 procedure TForm1.mnuExitClick(Sender: TObject);
