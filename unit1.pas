@@ -431,7 +431,7 @@ var
   JSONData: TJSONData;
   ScriptArray, CharactersArray: TJSONArray;
   i: integer;
-  FileContent: TStringList;
+  FileContent, screenplayContent: TStringList;
 begin
   if loadScript.Execute then
   begin
@@ -440,6 +440,7 @@ begin
 
     savedFileLocation := loadScript.Filename;
     FileContent := TStringList.Create;
+    screenplayContent := TStringList.Create;
     try
       try
         (* Clear current document *)
@@ -472,13 +473,16 @@ begin
                 characterList.Items.Add(CharactersArray.Items[i].AsString);
               end;
             end;
-
             ScriptArray := JSONData.FindPath('Script') as TJSONArray;
+
             if Assigned(ScriptArray) then
             begin
               for i := 0 to ScriptArray.Count - 1 do
-                screenplay.Lines.Add(ScriptArray.Items[i].AsString);
+                screenplayContent.Add(ScriptArray.Items[i].AsString);
+              (* Speeds up loading tmemo contents *)
+              screenplay.Lines.Text := screenplayContent.Text;
             end;
+
           end
           else
           begin
@@ -493,6 +497,7 @@ begin
       end;
     finally
       FileContent.Free;
+      screenplayContent.Free;
       if (characterList.items.Count > 0) then
       begin
         lblCharacters.Visible := True;
