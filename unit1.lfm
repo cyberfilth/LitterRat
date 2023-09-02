@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 436
+  Left = 230
   Height = 718
-  Top = 109
+  Top = 192
   Width = 1296
   Caption = 'LitterRat'
   ClientHeight = 698
@@ -9,6 +9,7 @@ object Form1: TForm1
   Menu = MainMenu1
   OnCreate = FormCreate
   Position = poScreenCenter
+  SessionProperties = 'Width;Height;Position;screenplay.Color;screenplay.Font'
   LCLVersion = '2.2.6.0'
   object StatusBar1: TStatusBar
     Left = 0
@@ -189,6 +190,7 @@ object Form1: TForm1
         end
         object mnuExpHTML: TMenuItem
           Caption = 'Export HTML'
+          ShortCut = 16453
           OnClick = mnuExpHTMLClick
         end
       end
@@ -242,27 +244,36 @@ object Form1: TForm1
     end
   end
   object ExportFountain: TSaveDialog
+    Title = 'Export as FOUNTAIN file'
     DefaultExt = '.fountain'
+    Filter = 'Fountain file|*.fountain'
     Left = 220
     Top = 2
   end
   object ImportFountain: TOpenDialog
+    Title = 'Import FOUNTAIN file'
     Filter = 'Fountain file|*.fountain'
     Left = 309
     Top = 2
   end
   object saveScript: TSaveDialog
+    Title = 'Save LitterRat file'
     DefaultExt = '.lit'
+    Filter = 'LitterRat file|*.lit'
     Left = 400
     Top = 2
   end
   object loadScript: TOpenDialog
+    Title = 'Open LitterRat file'
+    DefaultExt = '.lit'
     Filter = 'LitterRat file|*.lit'
     Left = 496
     Top = 2
   end
   object exportHTML: TSaveDialog
+    Title = 'Export as HTML'
     DefaultExt = '.html'
+    Filter = 'HTML File|*.html'
     Left = 592
     Top = 2
   end

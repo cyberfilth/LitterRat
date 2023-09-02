@@ -104,7 +104,7 @@ type
   end;
 
 const
-  VERSION = '0.9.5';
+  VERSION = '0.9.7';
 
 var
   Form1: TForm1;
@@ -335,17 +335,18 @@ begin
   (* Add HTML skeleton *)
   HTMLstring := HTMLstring + '<!DOCTYPE html>' + sLineBreak + '<html>' +
     sLineBreak + '<head>' + sLineBreak + '<title>' + documentName +
-    '</title>' + sLineBreak + '<style>' + sLineBreak + 'div {text-align: center;}' +
-    sLineBreak + '.transition {text-align: right;}' + sLineBreak +
+    '</title>' + sLineBreak + '<style>' + sLineBreak +
+    'div {text-align: center; margin:auto; width:420px;}' + sLineBreak +
+    '.transition {text-align: right;}' + sLineBreak +
     'body {font-family: "Courier New", Courier; font-size: 12px}' +
     sLineBreak + '</style>' + sLineBreak + '</head>' + sLineBreak +
     '<body>' + sLineBreak;
   (* Add title page *)
   HTMLstring := HTMLstring + '<br /><br /><br /><br /><br /><br /><br />' + sLineBreak;
-  HTMLstring := HTMLstring + '<div><strong>' + documentName +
-    '</strong><br />Author: ' + documentAuthor + '</div>';
-  HTMLstring := HTMLstring +
-    '<br /><br /><br /><br /><br /><p style="page-break-before: always">' + sLineBreak;
+  HTMLstring := HTMLstring + '<div><h1>' + documentName +
+    '</h1><br />By<br />' + documentAuthor + '</div>';
+  HTMLstring := HTMLstring + sLineBreak + '<br /><br /><br /><br /><br />' +
+    sLineBreak + '<p style="page-break-before: always">' + sLineBreak + '<div>';
 
   (* Add script *)
   for i := 0 to screenplay.Lines.Count - 1 do
@@ -358,22 +359,27 @@ begin
     else if (LeftStr(screenplay.Lines[i], 3) = 'EXT') or
       (LeftStr(screenplay.Lines[i], 3) = 'INT') or
       (LeftStr(screenplay.Lines[i], 3) = 'EST') then
-      HTMLstring := HTMLstring + '<strong>' + screenplay.Lines[i] +
-        '</strong>' + sLineBreak
+      HTMLstring := HTMLstring + '</div><strong>' + screenplay.Lines[i] +
+        '</strong>' + sLineBreak + '<div>'
 
     (* Transition *)
     else if (LeftStr(screenplay.Lines[i], 1) = '>') then
     begin
       transitionString := screenplay.Lines[i];
-      HTMLstring := HTMLstring + '<div class="transition">' +
-        RightStr(transitionString, Length(transitionString) - 1) + sLineBreak + '</div>';
+      HTMLstring := HTMLstring + '</div>' + sLineBreak +
+        '<div class="transition">' + RightStr(transitionString,
+        Length(transitionString) - 1) + sLineBreak + '</div><div>';
     end
 
+    (* Character *)
+    else if (alreadyInList(screenplay.Lines[i]) = True) then
+      HTMLstring := HTMLstring + sLineBreak + screenplay.Lines[i] + sLineBreak + '<br />'
+
     else
-      HTMLstring := HTMLstring + '<div>' + sLineBreak + screenplay.Lines[i] +
-        sLineBreak + '</div>';
+      HTMLstring := HTMLstring + sLineBreak + screenplay.Lines[i] + sLineBreak;
+
   end;
-  HTMLstring := HTMLstring + '</body>' + sLineBreak + '</html>' + sLineBreak;
+  HTMLstring := HTMLstring + '</div></body>' + sLineBreak + '</html>' + sLineBreak;
 
   AssignFile(F, ExportFilename);
   try

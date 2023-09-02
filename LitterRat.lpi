@@ -18,7 +18,7 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <MinorVersionNr Value="9"/>
-      <RevisionNr Value="6"/>
+      <RevisionNr Value="8"/>
       <Language Value="0809"/>
     </VersionInfo>
     <BuildModes>
@@ -103,6 +103,9 @@
       <FormatVersion Value="2"/>
     </RunParams>
     <RequiredPackages>
+      <Item>
+        <PackageName Value="IDEIntf"/>
+      </Item>
       <Item>
         <PackageName Value="LCL"/>
       </Item>
